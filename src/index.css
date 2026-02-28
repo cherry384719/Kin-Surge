@@ -1,3 +1,53 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-primary: #FFF8F0;
+    --bg-secondary: #FFF5EB;
+    --bg-card: #FFFAF5;
+    --text-primary: #2D1810;
+    --text-secondary: #5C4033;
+    --text-muted: #8B7355;
+    --accent: #8B0000;
+    --accent-hover: #A52A2A;
+    --border: #D4A574;
+    --border-light: #E8D5B7;
+    --success: #2E7D32;
+    --warning: #E65100;
+    --error: #B71C1C;
+    --gold: #DAA520;
+  }
+
+  .dark {
+    --bg-primary: #1A1A2E;
+    --bg-secondary: #16213E;
+    --bg-card: #1E2A4A;
+    --text-primary: #E8D5B7;
+    --text-secondary: #C4A882;
+    --text-muted: #8B7355;
+    --accent: #D4A574;
+    --accent-hover: #E8B44A;
+    --border: #4A3728;
+    --border-light: #3A2A1E;
+    --success: #66BB6A;
+    --warning: #FFA726;
+    --error: #EF5350;
+    --gold: #FFD700;
+  }
+
+  html {
+    font-family: 'Noto Sans SC', sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
+
+  /* Dynasty color schemes */
+  .dynasty-han { --dynasty-primary: #8B0000; --dynasty-secondary: #D4A574; }
+  .dynasty-weijin { --dynasty-primary: #2E8B57; --dynasty-secondary: #F0F0E8; }
+  .dynasty-tang { --dynasty-primary: #DAA520; --dynasty-secondary: #CC4444; }
+  .dynasty-song { --dynasty-primary: #7BA8A8; --dynasty-secondary: #FAF8F5; }
+  .dynasty-yuan { --dynasty-primary: #4A7C59; --dynasty-secondary: #4682B4; }
+  .dynasty-mingqing { --dynasty-primary: #B22222; --dynasty-secondary: #E8B44A; }
+}
