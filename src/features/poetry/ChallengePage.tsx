@@ -2,10 +2,14 @@ import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useChallenge } from './useChallenge'
 import { matchAnswer, MatchResult } from './matchAnswer'
+import { useUser } from '../auth/AuthProvider'
+import { useCoins } from '../gamification/useCoins'
 
 export function ChallengePage() {
   const { poetId } = useParams<{ poetId: string }>()
   const { lines, loading } = useChallenge(Number(poetId))
+  const { user } = useUser()
+  const { coins, awardCoins } = useCoins(user?.id ?? '')
 
   const [currentPairIndex, setCurrentPairIndex] = useState(0)
   const [input, setInput] = useState('')
@@ -22,6 +26,7 @@ export function ChallengePage() {
     if (!answerLine) return
     const result = matchAnswer(answerLine.text, input)
     setFeedback(result)
+    if (result === 'correct') awardCoins(10)
   }
 
   function handleNext() {
@@ -42,6 +47,7 @@ export function ChallengePage() {
   return (
     <div className="min-h-screen bg-amber-50 flex flex-col items-center justify-center p-8">
       <div className="bg-white rounded-xl shadow-md p-8 w-full max-w-lg">
+        <p className="text-sm text-right text-amber-700 mb-4">金币: {coins}</p>
         <p className="text-sm text-gray-500 mb-2">诗人说：</p>
         <p className="text-2xl font-bold text-amber-900 mb-6">{poetLine?.text}</p>
 
