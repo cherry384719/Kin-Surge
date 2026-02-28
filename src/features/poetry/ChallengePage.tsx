@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useChallenge } from './useChallenge'
-import { matchAnswer, MatchResult } from './matchAnswer'
+import { matchAnswer } from './matchAnswer'
+import type { MatchResult } from './matchAnswer'
 import { useUser } from '../auth/AuthProvider'
 import { useCoins } from '../gamification/useCoins'
 
