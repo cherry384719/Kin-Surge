@@ -2,10 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import { AuthProvider } from './features/auth/AuthProvider'
 import { ProtectedRoute } from './features/auth/ProtectedRoute'
 import { AuthPage } from './features/auth/AuthPage'
-
-function Placeholder({ label }: { label: string }) {
-  return <div className="p-8 text-2xl">{label}</div>
-}
+import { DynastyMap } from './features/scenes/DynastyMap'
 
 function LoginPage() {
   const navigate = useNavigate()
@@ -20,7 +17,7 @@ export default function App() {
           <Route path="/" element={<LoginPage />} />
           <Route
             path="/app/home"
-            element={<ProtectedRoute><Placeholder label="Dynasty Map" /></ProtectedRoute>}
+            element={<ProtectedRoute><DynastyMap /></ProtectedRoute>}
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
