@@ -3,6 +3,7 @@ import { AuthProvider } from './features/auth/AuthProvider'
 import { ProtectedRoute } from './features/auth/ProtectedRoute'
 import { AuthPage } from './features/auth/AuthPage'
 import { DynastyMap } from './features/scenes/DynastyMap'
+import { DynastyPage } from './features/scenes/DynastyPage'
 
 function LoginPage() {
   const navigate = useNavigate()
@@ -18,6 +19,10 @@ export default function App() {
           <Route
             path="/app/home"
             element={<ProtectedRoute><DynastyMap /></ProtectedRoute>}
+          />
+          <Route
+            path="/app/dynasty/:dynastyId"
+            element={<ProtectedRoute><DynastyPage /></ProtectedRoute>}
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
