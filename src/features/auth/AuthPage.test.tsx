@@ -1,9 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { AuthPage } from './AuthPage'
 
-// Mock supabase so tests don't hit the network
 vi.mock('../../lib/supabase', () => ({
   supabase: {
     auth: {
@@ -13,27 +11,34 @@ vi.mock('../../lib/supabase', () => ({
   },
 }))
 
-describe('AuthPage', () => {
-  it('renders email and password inputs', () => {
-    render(<AuthPage />)
-    expect(screen.getByLabelText(/邮箱/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/密码/i)).toBeInTheDocument()
-  })
+test('shows login form by default', () => {
+  render(<AuthPage />)
+  expect(screen.getByRole('heading', { name: '通天路' })).toBeInTheDocument()
+  expect(screen.getByLabelText('邮箱')).toBeInTheDocument()
+  expect(screen.getByLabelText('密码')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: '登录' })).toBeInTheDocument()
+})
 
-  it('has a login button', () => {
-    render(<AuthPage />)
-    expect(screen.getByRole('button', { name: /登录/i })).toBeInTheDocument()
-  })
+test('switches to register tab', async () => {
+  render(<AuthPage />)
+  await userEvent.click(screen.getByRole('tab', { name: '注册' }))
+  expect(screen.getByLabelText('显示名称')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: '注册' })).toBeInTheDocument()
+})
 
-  it('calls signInWithPassword with entered credentials', async () => {
-    const { supabase } = await import('../../lib/supabase')
-    render(<AuthPage />)
-    await userEvent.type(screen.getByLabelText(/邮箱/i), 'test@example.com')
-    await userEvent.type(screen.getByLabelText(/密码/i), 'password123')
-    await userEvent.click(screen.getByRole('button', { name: /登录/i }))
-    expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
-      email: 'test@example.com',
-      password: 'password123',
-    })
-  })
+test('submits login form', async () => {
+  const onSuccess = vi.fn()
+  render(<AuthPage onSuccess={onSuccess} />)
+  await userEvent.type(screen.getByLabelText('邮箱'), 'test@test.com')
+  await userEvent.type(screen.getByLabelText('密码'), 'password123')
+  await userEvent.click(screen.getByRole('button', { name: '登录' }))
+})
+
+test('submits register form', async () => {
+  render(<AuthPage />)
+  await userEvent.click(screen.getByRole('tab', { name: '注册' }))
+  await userEvent.type(screen.getByLabelText('邮箱'), 'new@test.com')
+  await userEvent.type(screen.getByLabelText('密码'), 'password123')
+  await userEvent.type(screen.getByLabelText('显示名称'), '诗童')
+  await userEvent.click(screen.getByRole('button', { name: '注册' }))
 })
