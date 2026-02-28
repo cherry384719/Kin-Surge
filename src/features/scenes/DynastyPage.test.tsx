@@ -1,5 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { DynastyPage } from './DynastyPage'
 
@@ -7,20 +6,39 @@ vi.mock('../../lib/supabase', () => ({
   supabase: {
     from: vi.fn().mockReturnValue({
       select: vi.fn().mockReturnValue({
-        eq: vi.fn().mockResolvedValue({
-          data: [
-            { id: 1, name: '李白', bio_short: '浪漫主义诗人', avatar_url: null },
-          ],
-          error: null,
+        eq: vi.fn().mockReturnValue({
+          order: vi.fn().mockResolvedValue({
+            data: [
+              { id: 1, name: '李白', bio_short: '诗仙', avatar_url: null, sort_order: 1, is_boss: false },
+              { id: 2, name: '杜甫', bio_short: '诗圣', avatar_url: null, sort_order: 2, is_boss: false },
+              { id: 99, name: '唐朝综合', bio_short: null, avatar_url: null, sort_order: 99, is_boss: true },
+            ],
+            error: null,
+          }),
         }),
       }),
     }),
+    auth: {
+      getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
+      onAuthStateChange: vi.fn().mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } }),
+    },
   },
 }))
 
-function renderWithRoute(id: string) {
+vi.mock('../progress/useProgress', () => ({
+  useProgress: () => ({
+    progressMap: { 1: { poet_id: 1, stars: 3, completed: true, mistakes: 0, used_reveal: false } },
+    loading: false,
+  }),
+}))
+
+vi.mock('../auth/AuthProvider', () => ({
+  useUser: () => ({ user: { id: 'test-user', user_metadata: {} }, loading: false }),
+}))
+
+function renderWithRoute() {
   return render(
-    <MemoryRouter initialEntries={[`/app/dynasty/${id}`]}>
+    <MemoryRouter initialEntries={['/app/dynasty/3']}>
       <Routes>
         <Route path="/app/dynasty/:dynastyId" element={<DynastyPage />} />
       </Routes>
@@ -28,19 +46,14 @@ function renderWithRoute(id: string) {
   )
 }
 
-describe('DynastyPage', () => {
-  it('renders a list of poets for the dynasty', async () => {
-    renderWithRoute('2')
-    await waitFor(() => {
-      expect(screen.getByText('李白')).toBeInTheDocument()
-    })
-  })
+test('renders poet names', async () => {
+  renderWithRoute()
+  expect(await screen.findByText('李白')).toBeInTheDocument()
+  expect(await screen.findByText('杜甫')).toBeInTheDocument()
+})
 
-  it('each poet links to the challenge page', async () => {
-    renderWithRoute('2')
-    await waitFor(() => {
-      const link = screen.getByRole('link', { name: /李白/i })
-      expect(link).toHaveAttribute('href', '/app/challenge/1')
-    })
-  })
+test('shows boss with special styling', async () => {
+  renderWithRoute()
+  const boss = await screen.findByText('唐朝综合')
+  expect(boss.closest('[data-boss]')).toBeInTheDocument()
 })

@@ -6,6 +6,8 @@ export interface Poet {
   name: string
   bio_short: string | null
   avatar_url: string | null
+  sort_order: number
+  is_boss: boolean
 }
 
 export function usePoets(dynastyId: number) {
@@ -15,8 +17,9 @@ export function usePoets(dynastyId: number) {
   useEffect(() => {
     supabase
       .from('poets')
-      .select('id, name, bio_short, avatar_url')
+      .select('id, name, bio_short, avatar_url, sort_order, is_boss')
       .eq('dynasty_id', dynastyId)
+      .order('sort_order')
       .then(({ data }) => {
         setPoets(data ?? [])
         setLoading(false)
