@@ -6,6 +6,7 @@ export interface Dynasty {
   name: string
   display_name: string
   sort_order: number
+  unlock_requirement: number
 }
 
 export function useDynasties() {

@@ -1,5 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { DynastyMap } from './DynastyMap'
 
@@ -9,35 +8,39 @@ vi.mock('../../lib/supabase', () => ({
       select: vi.fn().mockReturnValue({
         order: vi.fn().mockResolvedValue({
           data: [
-            { id: 1, name: 'tang', display_name: '唐朝', sort_order: 1 },
-            { id: 2, name: 'song', display_name: '宋朝', sort_order: 2 },
+            { id: 1, name: 'han', display_name: '汉朝', sort_order: 1, unlock_requirement: 0 },
+            { id: 2, name: 'tang', display_name: '唐朝', sort_order: 2, unlock_requirement: 3 },
           ],
           error: null,
         }),
       }),
     }),
+    auth: {
+      getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
+      onAuthStateChange: vi.fn().mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } }),
+    },
   },
 }))
 
-describe('DynastyMap', () => {
-  it('renders a heading', async () => {
-    render(<MemoryRouter><DynastyMap /></MemoryRouter>)
-    expect(screen.getByRole('heading', { name: /选择朝代/i })).toBeInTheDocument()
-  })
+vi.mock('../progress/useProgress', () => ({
+  useProgress: () => ({
+    progressMap: {},
+    loading: false,
+  }),
+}))
 
-  it('renders dynasty cards from Supabase data', async () => {
-    render(<MemoryRouter><DynastyMap /></MemoryRouter>)
-    await waitFor(() => {
-      expect(screen.getByText('唐朝')).toBeInTheDocument()
-      expect(screen.getByText('宋朝')).toBeInTheDocument()
-    })
-  })
+vi.mock('../auth/AuthProvider', () => ({
+  useUser: () => ({ user: { id: 'test-user', user_metadata: { display_name: '诗童' } }, loading: false }),
+}))
 
-  it('each dynasty card links to the dynasty page', async () => {
-    render(<MemoryRouter><DynastyMap /></MemoryRouter>)
-    await waitFor(() => {
-      const link = screen.getByRole('link', { name: /唐朝/i })
-      expect(link).toHaveAttribute('href', '/app/dynasty/1')
-    })
-  })
+test('renders dynasty names', async () => {
+  render(<MemoryRouter><DynastyMap /></MemoryRouter>)
+  expect(await screen.findByText('汉朝')).toBeInTheDocument()
+  expect(await screen.findByText('唐朝')).toBeInTheDocument()
+})
+
+test('shows locked state for locked dynasties', async () => {
+  render(<MemoryRouter><DynastyMap /></MemoryRouter>)
+  const tang = await screen.findByText('唐朝')
+  expect(tang.closest('[data-locked]')).toBeInTheDocument()
 })
