@@ -8,23 +8,40 @@ export interface PoemLine {
   text: string
 }
 
+export interface PoemInfo {
+  id: number
+  title: string
+}
+
 export function useChallenge(poetId: number) {
   const [lines, setLines] = useState<PoemLine[]>([])
+  const [poems, setPoems] = useState<PoemInfo[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Fetch lines for a random poem by this poet (limit 1 poem = 4 lines)
-    supabase
-      .from('poem_lines')
-      .select('id, poem_id, line_number, text')
-      .eq('poem_id', poetId)   // simplified for MVP: poetId doubles as poemId in seed data
-      .order('line_number')
-      .limit(8)
-      .then(({ data }) => {
-        setLines(data ?? [])
-        setLoading(false)
-      })
+    async function fetchData() {
+      const { data: poemData } = await supabase
+        .from('poems')
+        .select('id, title')
+        .eq('poet_id', poetId)
+        .order('id')
+
+      if (poemData && poemData.length > 0) {
+        setPoems(poemData)
+        const poemIds = poemData.map(p => p.id)
+        const { data: lineData } = await supabase
+          .from('poem_lines')
+          .select('id, poem_id, line_number, text')
+          .in('poem_id', poemIds)
+          .order('poem_id')
+          .order('line_number')
+
+        setLines(lineData ?? [])
+      }
+      setLoading(false)
+    }
+    fetchData()
   }, [poetId])
 
-  return { lines, loading }
+  return { lines, poems, loading }
 }
