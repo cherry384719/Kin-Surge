@@ -50,4 +50,58 @@
   .dynasty-song { --dynasty-primary: #7BA8A8; --dynasty-secondary: #FAF8F5; }
   .dynasty-yuan { --dynasty-primary: #4A7C59; --dynasty-secondary: #4682B4; }
   .dynasty-mingqing { --dynasty-primary: #B22222; --dynasty-secondary: #E8B44A; }
+
+  /* Dynasty-specific backgrounds and decorative styles */
+  .dynasty-bg-han {
+    background: linear-gradient(135deg, rgba(139,0,0,0.05) 0%, rgba(212,165,116,0.08) 100%);
+  }
+  .dynasty-bg-weijin {
+    background: linear-gradient(135deg, rgba(46,139,87,0.05) 0%, rgba(240,240,232,0.08) 100%);
+  }
+  .dynasty-bg-tang {
+    background: linear-gradient(135deg, rgba(218,165,32,0.05) 0%, rgba(204,68,68,0.08) 100%);
+  }
+  .dynasty-bg-song {
+    background: linear-gradient(135deg, rgba(123,168,168,0.05) 0%, rgba(250,248,245,0.08) 100%);
+  }
+  .dynasty-bg-yuan {
+    background: linear-gradient(135deg, rgba(74,124,89,0.05) 0%, rgba(70,130,180,0.08) 100%);
+  }
+  .dynasty-bg-mingqing {
+    background: linear-gradient(135deg, rgba(178,34,34,0.05) 0%, rgba(232,180,74,0.08) 100%);
+  }
+
+  /* Dark mode dynasty backgrounds */
+  .dark .dynasty-bg-han {
+    background: linear-gradient(135deg, rgba(139,0,0,0.15) 0%, rgba(212,165,116,0.1) 100%);
+  }
+  .dark .dynasty-bg-weijin {
+    background: linear-gradient(135deg, rgba(46,139,87,0.15) 0%, rgba(240,240,232,0.08) 100%);
+  }
+  .dark .dynasty-bg-tang {
+    background: linear-gradient(135deg, rgba(218,165,32,0.15) 0%, rgba(204,68,68,0.1) 100%);
+  }
+  .dark .dynasty-bg-song {
+    background: linear-gradient(135deg, rgba(123,168,168,0.15) 0%, rgba(250,248,245,0.08) 100%);
+  }
+  .dark .dynasty-bg-yuan {
+    background: linear-gradient(135deg, rgba(74,124,89,0.15) 0%, rgba(70,130,180,0.1) 100%);
+  }
+  .dark .dynasty-bg-mingqing {
+    background: linear-gradient(135deg, rgba(178,34,34,0.15) 0%, rgba(232,180,74,0.1) 100%);
+  }
+
+  /* Decorative top border accent for dynasty pages */
+  .dynasty-accent-bar {
+    position: relative;
+  }
+  .dynasty-accent-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--dynasty-primary), var(--dynasty-secondary), var(--dynasty-primary));
+  }
 }

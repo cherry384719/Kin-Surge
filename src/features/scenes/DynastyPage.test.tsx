@@ -4,19 +4,43 @@ import { DynastyPage } from './DynastyPage'
 
 vi.mock('../../lib/supabase', () => ({
   supabase: {
-    from: vi.fn().mockReturnValue({
-      select: vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({
-            data: [
-              { id: 1, name: '李白', bio_short: '诗仙', avatar_url: null, sort_order: 1, is_boss: false },
-              { id: 2, name: '杜甫', bio_short: '诗圣', avatar_url: null, sort_order: 2, is_boss: false },
-              { id: 99, name: '唐朝综合', bio_short: null, avatar_url: null, sort_order: 99, is_boss: true },
-            ],
-            error: null,
+    from: vi.fn().mockImplementation((table: string) => {
+      if (table === 'poets') {
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({
+                data: [
+                  { id: 1, name: '李白', bio_short: '诗仙', avatar_url: null, sort_order: 1, is_boss: false },
+                  { id: 2, name: '杜甫', bio_short: '诗圣', avatar_url: null, sort_order: 2, is_boss: false },
+                  { id: 99, name: '唐朝综合', bio_short: null, avatar_url: null, sort_order: 99, is_boss: true },
+                ],
+                error: null,
+              }),
+            }),
           }),
-        }),
-      }),
+        }
+      }
+      if (table === 'dynasties') {
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
+                data: { id: 3, name: 'tang', display_name: '唐朝' },
+                error: null,
+              }),
+            }),
+          }),
+        }
+      }
+      if (table === 'poet_progress') {
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+          }),
+        }
+      }
+      return { select: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ data: [], error: null }) }) }
     }),
     auth: {
       getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
@@ -29,6 +53,7 @@ vi.mock('../progress/useProgress', () => ({
   useProgress: () => ({
     progressMap: { 1: { poet_id: 1, stars: 3, completed: true, mistakes: 0, used_reveal: false } },
     loading: false,
+    saveProgress: vi.fn(),
   }),
 }))
 

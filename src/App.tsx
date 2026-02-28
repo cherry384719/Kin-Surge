@@ -28,7 +28,7 @@ export default function App() {
           <Route path="/" element={<LoginPage />} />
           <Route path="/app/home" element={<ProtectedWithLayout><DynastyMap /></ProtectedWithLayout>} />
           <Route path="/app/dynasty/:dynastyId" element={<ProtectedWithLayout><DynastyPage /></ProtectedWithLayout>} />
-          <Route path="/app/challenge/:poetId" element={<ProtectedWithLayout><ChallengePage /></ProtectedWithLayout>} />
+          <Route path="/app/dynasty/:dynastyId/challenge/:poetId" element={<ProtectedWithLayout><ChallengePage /></ProtectedWithLayout>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

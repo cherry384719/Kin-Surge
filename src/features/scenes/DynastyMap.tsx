@@ -4,6 +4,8 @@ import { useUser } from '../auth/AuthProvider'
 import { useProgress } from '../progress/useProgress'
 import { isDynastyUnlocked } from '../progress/unlockLogic'
 import type { DynastyWithProgress } from '../progress/unlockLogic'
+import { useEffect, useState } from 'react'
+import { supabase } from '../../lib/supabase'
 
 const DYNASTY_STYLES: Record<string, string> = {
   han: 'dynasty-han',
@@ -14,23 +16,49 @@ const DYNASTY_STYLES: Record<string, string> = {
   mingqing: 'dynasty-mingqing',
 }
 
+interface PoetBasic {
+  id: number
+  dynasty_id: number
+  is_boss: boolean
+}
+
 export function DynastyMap() {
   const { dynasties, loading } = useDynasties()
   const { user } = useUser()
-  const { loading: progressLoading } = useProgress(user?.id ?? '')
+  const { progressMap, loading: progressLoading } = useProgress(user?.id ?? '')
+  const [allPoets, setAllPoets] = useState<PoetBasic[]>([])
+  const [poetsLoading, setPoetsLoading] = useState(true)
 
-  if (loading || progressLoading) {
+  useEffect(() => {
+    supabase
+      .from('poets')
+      .select('id, dynasty_id, is_boss')
+      .then(({ data }) => {
+        setAllPoets(data ?? [])
+        setPoetsLoading(false)
+      })
+  }, [])
+
+  if (loading || progressLoading || poetsLoading) {
     return <div className="flex items-center justify-center py-20 text-text-muted">加载中…</div>
   }
 
-  const dynastyProgressList: DynastyWithProgress[] = dynasties.map(d => ({
-    id: d.id,
-    sort_order: d.sort_order,
-    unlock_requirement: d.unlock_requirement,
-    completedPoets: 0,
-    totalPoets: 0,
-    bossCompleted: false,
-  }))
+  const dynastyProgressList: DynastyWithProgress[] = dynasties.map(d => {
+    const dynastyPoets = allPoets.filter(p => p.dynasty_id === d.id)
+    const regularPoets = dynastyPoets.filter(p => !p.is_boss)
+    const bossPoet = dynastyPoets.find(p => p.is_boss)
+    const completedPoets = regularPoets.filter(p => progressMap[p.id]?.completed).length
+    const bossCompleted = bossPoet ? (progressMap[bossPoet.id]?.completed ?? false) : false
+
+    return {
+      id: d.id,
+      sort_order: d.sort_order,
+      unlock_requirement: d.unlock_requirement,
+      completedPoets,
+      totalPoets: regularPoets.length,
+      bossCompleted,
+    }
+  })
 
   return (
     <div className="py-8 px-4">
@@ -48,11 +76,7 @@ export function DynastyMap() {
 
           if (!unlocked) {
             return (
-              <div
-                key={d.id}
-                data-locked
-                className="flex-shrink-0 w-40 snap-center opacity-50"
-              >
+              <div key={d.id} data-locked className="flex-shrink-0 w-40 snap-center opacity-50">
                 <div className="bg-bg-card rounded-2xl border-2 border-border-light p-6 text-center h-48 flex flex-col items-center justify-center">
                   <div className="text-4xl mb-3 text-text-muted">🔒</div>
                   <span className="font-serif text-lg text-text-muted">{d.display_name}</span>
@@ -62,20 +86,19 @@ export function DynastyMap() {
           }
 
           return (
-            <Link
-              key={d.id}
-              to={`/app/dynasty/${d.id}`}
-              className={`flex-shrink-0 w-40 snap-center ${styleClass}`}
-            >
+            <Link key={d.id} to={`/app/dynasty/${d.id}`} className={`flex-shrink-0 w-40 snap-center ${styleClass}`}>
               <div className="bg-bg-card rounded-2xl border-2 border-[var(--dynasty-primary)] p-6 text-center h-48 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
                 <div className="w-16 h-16 rounded-full bg-[var(--dynasty-primary)]/10 flex items-center justify-center mb-3">
                   <span className="font-serif text-2xl font-bold text-[var(--dynasty-primary)]">
                     {d.display_name.charAt(0)}
                   </span>
                 </div>
-                <span className="font-serif text-lg font-bold text-[var(--dynasty-primary)]">
-                  {d.display_name}
-                </span>
+                <span className="font-serif text-lg font-bold text-[var(--dynasty-primary)]">{d.display_name}</span>
+                {dp.completedPoets > 0 && (
+                  <span className="text-xs text-text-muted mt-1">
+                    {dp.completedPoets}/{dp.totalPoets} 通关
+                  </span>
+                )}
               </div>
             </Link>
           )

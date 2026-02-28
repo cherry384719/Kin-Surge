@@ -48,6 +48,18 @@ vi.mock('../../lib/supabase', () => ({
           upsert: vi.fn().mockResolvedValue({}),
         }
       }
+      if (table === 'dynasties') {
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
+                data: { id: 3, name: 'tang', display_name: '唐朝' },
+                error: null,
+              }),
+            }),
+          }),
+        }
+      }
       return { select: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ data: [], error: null }) }) }
     }),
     auth: {
@@ -63,9 +75,9 @@ vi.mock('../auth/AuthProvider', () => ({
 
 function renderChallenge() {
   return render(
-    <MemoryRouter initialEntries={['/app/challenge/1']}>
+    <MemoryRouter initialEntries={['/app/dynasty/3/challenge/1']}>
       <Routes>
-        <Route path="/app/challenge/:poetId" element={<ChallengePage />} />
+        <Route path="/app/dynasty/:dynastyId/challenge/:poetId" element={<ChallengePage />} />
       </Routes>
     </MemoryRouter>
   )
