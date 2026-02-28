@@ -1,16 +1,19 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
 
 export function useCoins(userId: string) {
   const [coins, setCoins] = useState(0)
 
-  async function awardCoins(amount: number) {
-    setCoins(prev => prev + amount)
-    await supabase
-      .from('user_profiles')
-      .update({ coins: coins + amount })
-      .eq('user_id', userId)
-  }
+  const awardCoins = useCallback(async (amount: number) => {
+    setCoins(prev => {
+      const newTotal = prev + amount
+      supabase
+        .from('user_profiles')
+        .update({ coins: newTotal })
+        .eq('user_id', userId)
+      return newTotal
+    })
+  }, [userId])
 
   return { coins, awardCoins }
 }
