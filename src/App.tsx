@@ -8,6 +8,7 @@ import { AppLayout } from './features/layout/AppLayout'
 const DynastyMap = lazy(() => import('./features/scenes/DynastyMap').then(m => ({ default: m.DynastyMap })))
 const DynastyPage = lazy(() => import('./features/scenes/DynastyPage').then(m => ({ default: m.DynastyPage })))
 const ChallengePage = lazy(() => import('./features/poetry/ChallengePage').then(m => ({ default: m.ChallengePage })))
+const FeihuaLingPage = lazy(() => import('./features/poetry/FeihuaLingPage').then(m => ({ default: m.FeihuaLingPage })))
 
 function LoginPage() {
   const navigate = useNavigate()
@@ -32,6 +33,7 @@ export default function App() {
             <Route path="/app/home" element={<ProtectedWithLayout><DynastyMap /></ProtectedWithLayout>} />
             <Route path="/app/dynasty/:dynastyId" element={<ProtectedWithLayout><DynastyPage /></ProtectedWithLayout>} />
             <Route path="/app/dynasty/:dynastyId/challenge/:poetId" element={<ProtectedWithLayout><ChallengePage /></ProtectedWithLayout>} />
+            <Route path="/app/feihualing" element={<ProtectedWithLayout><FeihuaLingPage /></ProtectedWithLayout>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>

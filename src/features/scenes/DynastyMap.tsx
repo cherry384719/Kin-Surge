@@ -99,6 +99,13 @@ export function DynastyMap() {
           >
             无尽模式
           </button>
+          <button
+            onClick={() => navigate('/app/feihualing')}
+            className="px-4 py-2 rounded-full bg-gold text-white shadow hover:shadow-lg transition-all active:translate-y-[1px]"
+            aria-label="飞花令模式"
+          >
+            飞花令
+          </button>
         </div>
       </div>
 
