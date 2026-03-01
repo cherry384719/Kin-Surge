@@ -29,7 +29,7 @@ export function useEnergy() {
     }
   }
 
-  function consume(amount = 1) {
+  function consume(_amount = 1) {
     // energy unlimited mode: always allow
     return true
   }
