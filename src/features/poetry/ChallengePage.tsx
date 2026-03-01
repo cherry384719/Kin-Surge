@@ -46,6 +46,7 @@ export function ChallengePage() {
   const [usedReveal, setUsedReveal] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const savedRef = useRef(false)
+  const [correctCount, setCorrectCount] = useState(0)
 
   useEffect(() => {
     if (!isDaily) return
@@ -88,6 +89,7 @@ export function ChallengePage() {
       awardCoins(10)
       markPlayed()
       playCorrect()
+      setCorrectCount(prev => prev + 1)
     } else if (result === 'wrong') {
       setMistakes(prev => prev + 1)
       playWrong()
@@ -111,12 +113,13 @@ export function ChallengePage() {
   }
 
   if (showResults) {
-    const stars = usedReveal ? 1 : mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1
-    const earnedCoins = totalPairs * 10
-    const dailyBonus = isDaily && !dailyBonusAwarded ? 50 : 0
+    const passed = correctCount > 0
+    const stars = !passed ? 0 : usedReveal ? 1 : mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1
+    const earnedCoins = passed ? totalPairs * 10 : 0
+    const dailyBonus = passed && isDaily && !dailyBonusAwarded ? 50 : 0
 
     // Save progress once when results are shown
-    if (!savedRef.current) {
+    if (passed && !savedRef.current) {
       savedRef.current = true
       saveProgress(Number(poetId), stars, mistakes, usedReveal)
       if (dailyBonus > 0) {
@@ -156,14 +159,23 @@ export function ChallengePage() {
               )}
               {isDaily && <p className="text-[10px] text-success mb-2">每日挑战</p>}
               {isEndless && <p className="text-[10px] text-warning mb-2">无尽模式</p>}
-              <h2 className="font-serif text-2xl font-bold mb-4" style={{ color: 'var(--dynasty-primary, var(--accent))' }}>闯关完成！</h2>
-              <div className="text-4xl mb-4">
-                {'★'.repeat(stars)}{'☆'.repeat(3 - stars)}
-              </div>
-              <p className="text-text-secondary mb-2">获得 <span className="text-gold font-bold">{earnedCoins}</span> 金币{dailyBonus > 0 ? ` + 日常奖励 ${dailyBonus}` : ''}</p>
-              <p className="text-text-muted text-sm mb-6">
-                {mistakes === 0 ? '完美通关！' : `答错 ${mistakes} 次`}
-              </p>
+              <h2 className="font-serif text-2xl font-bold mb-4" style={{ color: 'var(--dynasty-primary, var(--accent))' }}>
+                {passed ? '闯关完成！' : '未通过，需至少答对一题'}
+              </h2>
+              {passed && (
+                <>
+                  <div className="text-4xl mb-4">
+                    {'★'.repeat(stars)}{'☆'.repeat(3 - stars)}
+                  </div>
+                  <p className="text-text-secondary mb-2">获得 <span className="text-gold font-bold">{earnedCoins}</span> 金币{dailyBonus > 0 ? ` + 日常奖励 ${dailyBonus}` : ''}</p>
+                  <p className="text-text-muted text-sm mb-6">
+                    {mistakes === 0 ? '完美通关！' : `答错 ${mistakes} 次`}
+                  </p>
+                </>
+              )}
+              {!passed && (
+                <p className="text-text-muted text-sm mb-6">请至少答对一题后再试。</p>
+              )}
               <div className="space-y-2">
                 <button
                   onClick={() => navigate(-1)}
@@ -172,7 +184,7 @@ export function ChallengePage() {
                 >
                   返回
                 </button>
-                {isEndless && nextEndless && (
+                {passed && isEndless && nextEndless && (
                   <button
                     onClick={() => navigate(`/app/dynasty/${nextEndless.dynastyId}/challenge/${nextEndless.poetId}`, { state: { endless: true } })}
                     className="w-full py-2.5 rounded-xl border border-[var(--dynasty-primary)] text-[var(--dynasty-primary)] transition-colors bg-bg-primary"
