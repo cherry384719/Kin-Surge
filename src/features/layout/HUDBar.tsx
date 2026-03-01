@@ -51,18 +51,6 @@ export function HUDBar({
             <span className="text-lg">🔥</span>
             <span className="font-bold text-text-primary">{streak} 天</span>
           </div>
-          <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-bg-secondary border border-border-light shadow-sm">
-            <span className="text-lg">⚡</span>
-            <div className="flex gap-0.5">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <span
-                  key={i}
-                  className={`w-2 h-3 rounded-sm ${i < energy ? 'bg-[var(--dynasty-primary,var(--accent))]' : 'bg-border-light'}`}
-                  aria-hidden
-                />
-              ))}
-            </div>
-          </div>
         </div>
 
         <div className="flex items-center justify-end gap-3">
