@@ -140,7 +140,6 @@ export function ChallengePage() {
             dynastyName={dynasty?.display_name}
             coins={coins}
             streak={streak}
-            energy={energy}
             onHome={() => navigate('/app/home')}
             audioEnabled={audioEnabled}
             onToggleAudio={toggleAudio}
@@ -209,7 +208,6 @@ export function ChallengePage() {
           dynastyName={dynasty?.display_name}
           coins={coins}
           streak={streak}
-          energy={energy}
           onHome={() => navigate('/app/home')}
           audioEnabled={audioEnabled}
           onToggleAudio={toggleAudio}
