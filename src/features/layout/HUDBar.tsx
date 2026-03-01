@@ -5,7 +5,6 @@ interface HUDBarProps {
   dynastyName?: string
   coins?: number
   streak?: number
-  energy?: number
   onHome?: () => void
   audioEnabled?: boolean
   onToggleAudio?: () => void
