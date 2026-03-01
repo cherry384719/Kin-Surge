@@ -109,6 +109,19 @@ export function DynastyMap() {
         </div>
       </div>
 
+      {/* Total progress */}
+      <div className="text-center mb-6 relative z-10">
+        <p className="text-text-muted text-sm">
+          总进度：{Object.values(progressMap).filter(p => p.completed).length} / {allPoets.length} 诗人已通关
+        </p>
+        <div className="w-48 mx-auto bg-bg-secondary rounded-full h-2 mt-2 overflow-hidden">
+          <div
+            className="h-2 rounded-full bg-accent transition-all"
+            style={{ width: `${allPoets.length ? (Object.values(progressMap).filter(p => p.completed).length / allPoets.length) * 100 : 0}%` }}
+          />
+        </div>
+      </div>
+
       <div className="flex overflow-x-auto gap-6 pb-6 px-4 max-w-5xl mx-auto snap-x snap-mandatory relative z-10">
         {dynasties.map((d, i) => {
           const dp = dynastyProgressList[i]
