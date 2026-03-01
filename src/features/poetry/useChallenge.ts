@@ -18,6 +18,8 @@ export interface PoetInfo {
   name: string
   bio_short: string
   challenge_intro: string
+  is_boss: boolean
+  dynasty_id: number
 }
 
 export function useChallenge(poetId: number) {
@@ -45,16 +47,37 @@ export function useChallenge(poetId: number) {
 
       const { data: poetData } = await supabase
         .from('poets')
-        .select('id, name, bio_short, challenge_intro')
+        .select('id, name, bio_short, challenge_intro, is_boss, dynasty_id')
         .eq('id', poetId)
         .single()
       if (poetData) setPoet(poetData)
 
-      const { data: poemData } = await supabase
-        .from('poems')
-        .select('id, title')
-        .eq('poet_id', poetId)
-        .order('id')
+      let poemData: PoemInfo[] | null = null
+
+      if (poetData?.is_boss) {
+        // Boss poet: aggregate poems from all regular poets in the same dynasty
+        const { data: dynastyPoets } = await supabase
+          .from('poets')
+          .select('id')
+          .eq('dynasty_id', poetData.dynasty_id)
+          .eq('is_boss', false)
+        const poetIds = dynastyPoets?.map(p => p.id) ?? []
+        if (poetIds.length > 0) {
+          const { data } = await supabase
+            .from('poems')
+            .select('id, title')
+            .in('poet_id', poetIds)
+            .order('id')
+          poemData = data
+        }
+      } else {
+        const { data } = await supabase
+          .from('poems')
+          .select('id, title')
+          .eq('poet_id', poetId)
+          .order('id')
+        poemData = data
+      }
 
       if (poemData && poemData.length > 0) {
         setPoems(poemData)
