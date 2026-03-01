@@ -35,6 +35,7 @@ export function useProgress(userId: string) {
   }, [userId])
 
   async function saveProgress(poetId: number, stars: number, mistakes: number, usedReveal: boolean) {
+    if (!userId) return
     const entry = { user_id: userId, poet_id: poetId, stars, completed: true, mistakes, used_reveal: usedReveal }
     await supabase.from('poet_progress').upsert(entry, { onConflict: 'user_id,poet_id' })
     setProgressMap(prev => ({ ...prev, [poetId]: { poet_id: poetId, stars, completed: true, mistakes, used_reveal: usedReveal } }))

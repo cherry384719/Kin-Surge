@@ -24,8 +24,9 @@ export function ChallengePage() {
   const navigate = useNavigate()
   const { lines, poems, loading } = useChallenge(Number(poetId))
   const { user } = useUser()
-  const { coins, awardCoins } = useCoins(user?.id ?? '')
-  const { saveProgress } = useProgress(user?.id ?? '')
+  const userId = user?.id
+  const { coins, awardCoins } = useCoins(userId)
+  const { saveProgress } = useProgress(userId ?? '')
   const { dynasty, styleClass, bgClass } = useDynastyInfo(Number(dynastyId))
   const { streak, markPlayed } = useStreak()
   const { energy, consume } = useEnergy()
@@ -69,7 +70,7 @@ export function ChallengePage() {
     fetchNext()
   }, [isEndless, showResults, dynastyId, poetId])
 
-  if (loading) return <div className="flex items-center justify-center py-20 text-text-muted">加载中…</div>
+  if (!userId || loading) return <div className="flex items-center justify-center py-20 text-text-muted">加载中…</div>
   if (lines.length < 2) return <div className="flex items-center justify-center py-20 text-text-muted">暂无题目</div>
 
   const totalPairs = Math.floor(lines.length / 2)

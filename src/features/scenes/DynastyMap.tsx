@@ -28,7 +28,8 @@ interface PoetBasic {
 export function DynastyMap() {
   const { dynasties, loading } = useDynasties()
   const { user } = useUser()
-  const { progressMap, loading: progressLoading } = useProgress(user?.id ?? '')
+  const userId = user?.id ?? ''
+  const { progressMap, loading: progressLoading } = useProgress(userId)
   const [allPoets, setAllPoets] = useState<PoetBasic[]>([])
   const [poetsLoading, setPoetsLoading] = useState(true)
   const { reducedData } = useReducedData()
