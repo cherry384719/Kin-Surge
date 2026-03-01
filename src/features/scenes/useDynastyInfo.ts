@@ -41,6 +41,5 @@ export function useDynastyInfo(dynastyId: number) {
 
   const styleClass = dynasty ? DYNASTY_STYLE_MAP[dynasty.name] ?? '' : ''
   const bgClass = dynasty ? DYNASTY_BG_MAP[dynasty.name] ?? '' : ''
-
   return { dynasty, styleClass, bgClass }
 }

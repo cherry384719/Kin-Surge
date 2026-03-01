@@ -20,6 +20,20 @@ export function useChallenge(poetId: number) {
 
   useEffect(() => {
     async function fetchData() {
+      const cacheKey = `kin-challenge-${poetId}`
+      const cached = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(cacheKey) : null
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached) as { poems: PoemInfo[]; lines: PoemLine[] }
+          setPoems(parsed.poems)
+          setLines(parsed.lines)
+          setLoading(false)
+          return
+        } catch {
+          /* ignore cache parse errors */
+        }
+      }
+
       const { data: poemData } = await supabase
         .from('poems')
         .select('id, title')
@@ -37,6 +51,9 @@ export function useChallenge(poetId: number) {
           .order('line_number')
 
         setLines(lineData ?? [])
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.setItem(cacheKey, JSON.stringify({ poems: poemData, lines: lineData ?? [] }))
+        }
       }
       setLoading(false)
     }
