@@ -99,6 +99,26 @@ export function DynastyMap() {
           >
             无尽模式
           </button>
+          <button
+            onClick={() => navigate('/app/feihualing')}
+            className="px-4 py-2 rounded-full bg-gold text-white shadow hover:shadow-lg transition-all active:translate-y-[1px]"
+            aria-label="飞花令模式"
+          >
+            飞花令
+          </button>
+        </div>
+      </div>
+
+      {/* Total progress */}
+      <div className="text-center mb-6 relative z-10">
+        <p className="text-text-muted text-sm">
+          总进度：{Object.values(progressMap).filter(p => p.completed).length} / {allPoets.length} 诗人已通关
+        </p>
+        <div className="w-48 mx-auto bg-bg-secondary rounded-full h-2 mt-2 overflow-hidden">
+          <div
+            className="h-2 rounded-full bg-accent transition-all"
+            style={{ width: `${allPoets.length ? (Object.values(progressMap).filter(p => p.completed).length / allPoets.length) * 100 : 0}%` }}
+          />
         </div>
       </div>
 

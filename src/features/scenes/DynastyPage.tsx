@@ -46,6 +46,10 @@ export function DynastyPage() {
           <h1 className="font-serif text-2xl font-bold mt-2" style={{ color: 'var(--dynasty-primary, var(--accent))' }}>
             {dynasty?.display_name ?? '选择诗人'}
           </h1>
+          <p className="text-text-muted text-sm mt-1">
+            {regularPoets.filter(p => progressMap[p.id]?.completed).length} / {regularPoets.length} 诗人已通关
+            {bossPoet && progressMap[bossPoet.id]?.completed && ' · Boss已破'}
+          </p>
         </div>
 
         <div className="max-w-md mx-auto space-y-3">

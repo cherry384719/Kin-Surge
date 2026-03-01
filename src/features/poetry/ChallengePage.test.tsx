@@ -37,8 +37,34 @@ vi.mock('../../lib/supabase', () => ({
           }),
         }
       }
+      if (table === 'poets') {
+        return {
+          select: vi.fn().mockImplementation((cols: string) => {
+            if (cols.includes('challenge_intro')) {
+              return {
+                eq: vi.fn().mockReturnValue({
+                  single: vi.fn().mockResolvedValue({
+                    data: { id: 1, name: '李白', bio_short: '诗仙', challenge_intro: '吾乃诗仙李白！' },
+                    error: null,
+                  }),
+                }),
+              }
+            }
+            return {
+              eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+            }
+          }),
+        }
+      }
       if (table === 'user_profiles') {
-        return { update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({}) }) }
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({ data: { coins: 100 }, error: null }),
+            }),
+          }),
+          upsert: vi.fn().mockResolvedValue({}),
+        }
       }
       if (table === 'poet_progress') {
         return {
@@ -83,16 +109,16 @@ function renderChallenge() {
   )
 }
 
-test('shows poet line as prompt', async () => {
+test('shows poet intro screen first', async () => {
   renderChallenge()
-  expect(await screen.findByText('床前明月光')).toBeInTheDocument()
+  expect(await screen.findByText('李白')).toBeInTheDocument()
+  expect(screen.getByText(/诗仙李白/)).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: '开始挑战' })).toBeInTheDocument()
 })
 
-test('shows correct feedback on right answer', async () => {
+test('clicking start shows challenge round', async () => {
   renderChallenge()
-  await screen.findByText('床前明月光')
-  const input = screen.getByPlaceholderText('请填写下一句…')
-  await userEvent.type(input, '疑是地上霜')
-  await userEvent.click(screen.getByRole('button', { name: '提交' }))
-  expect(await screen.findByText('正确！')).toBeInTheDocument()
+  await screen.findByText('李白')
+  await userEvent.click(screen.getByRole('button', { name: '开始挑战' }))
+  expect(await screen.findByText(/选择题/)).toBeInTheDocument()
 })

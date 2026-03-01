@@ -13,9 +13,17 @@ export interface PoemInfo {
   title: string
 }
 
+export interface PoetInfo {
+  id: number
+  name: string
+  bio_short: string
+  challenge_intro: string
+}
+
 export function useChallenge(poetId: number) {
   const [lines, setLines] = useState<PoemLine[]>([])
   const [poems, setPoems] = useState<PoemInfo[]>([])
+  const [poet, setPoet] = useState<PoetInfo | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -24,15 +32,23 @@ export function useChallenge(poetId: number) {
       const cached = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(cacheKey) : null
       if (cached) {
         try {
-          const parsed = JSON.parse(cached) as { poems: PoemInfo[]; lines: PoemLine[] }
+          const parsed = JSON.parse(cached) as { poems: PoemInfo[]; lines: PoemLine[]; poet: PoetInfo | null }
           setPoems(parsed.poems)
           setLines(parsed.lines)
+          if (parsed.poet) setPoet(parsed.poet)
           setLoading(false)
           return
         } catch {
           /* ignore cache parse errors */
         }
       }
+
+      const { data: poetData } = await supabase
+        .from('poets')
+        .select('id, name, bio_short, challenge_intro')
+        .eq('id', poetId)
+        .single()
+      if (poetData) setPoet(poetData)
 
       const { data: poemData } = await supabase
         .from('poems')
@@ -52,7 +68,7 @@ export function useChallenge(poetId: number) {
 
         setLines(lineData ?? [])
         if (typeof sessionStorage !== 'undefined') {
-          sessionStorage.setItem(cacheKey, JSON.stringify({ poems: poemData, lines: lineData ?? [] }))
+          sessionStorage.setItem(cacheKey, JSON.stringify({ poems: poemData, lines: lineData ?? [], poet: poetData }))
         }
       }
       setLoading(false)
@@ -60,5 +76,5 @@ export function useChallenge(poetId: number) {
     fetchData()
   }, [poetId])
 
-  return { lines, poems, loading }
+  return { lines, poems, poet, loading }
 }
