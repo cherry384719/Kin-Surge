@@ -14,7 +14,6 @@ export function HUDBar({
   dynastyName,
   coins = 0,
   streak = 0,
-  energy = 5,
   onHome,
   audioEnabled = true,
   onToggleAudio,
