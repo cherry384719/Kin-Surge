@@ -10,10 +10,7 @@ interface EnergyState {
 }
 
 export function useEnergy() {
-  const [state, setState] = useState<EnergyState>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    return saved ? JSON.parse(saved) : { energy: MAX_ENERGY, lastRefill: Date.now() }
-  })
+  const [state, setState] = useState<EnergyState>(() => ({ energy: MAX_ENERGY, lastRefill: Date.now() }))
 
   useEffect(() => {
     const id = window.setInterval(() => tick(), 60 * 1000)
@@ -33,17 +30,13 @@ export function useEnergy() {
   }
 
   function consume(amount = 1) {
-    if (state.energy < amount) return false
-    const nextState = { energy: state.energy - amount, lastRefill: Date.now() }
-    setState(nextState)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState))
+    // energy unlimited mode: always allow
     return true
   }
 
   function refillAll() {
     const nextState = { energy: MAX_ENERGY, lastRefill: Date.now() }
     setState(nextState)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState))
   }
 
   return { energy: state.energy, consume, refillAll, tick }
