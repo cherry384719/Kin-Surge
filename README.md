@@ -2,6 +2,8 @@
 
 一个重新架构后的古诗词学习项目：前端使用 React + Vite，后端使用 Go + Gin，存储落在本地 SQLite，并支持单容器演示和服务器 Docker 部署。
 
+![image](https://cherry384719.github.io/picx-images-hosting/image.64eeu1b5zm.png)
+
 ## 当前范围
 
 - 用户体系：用户名/邮箱登录、注册、游客试玩
