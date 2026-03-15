@@ -1,43 +1,48 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
-import { Suspense, lazy } from 'react'
-import { AuthProvider } from './features/auth/AuthProvider'
-import { ProtectedRoute } from './features/auth/ProtectedRoute'
-import { AuthPage } from './features/auth/AuthPage'
-import { AppLayout } from './features/layout/AppLayout'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { SessionProvider } from './providers/SessionProvider'
+import { useSession } from './providers/session'
+import { AuthPage } from './pages/AuthPage'
+import { DashboardPage } from './pages/DashboardPage'
+import { DynastyPage } from './pages/DynastyPage'
+import { ChallengePage } from './pages/ChallengePage'
+import './App.css'
 
-const DynastyMap = lazy(() => import('./features/scenes/DynastyMap').then(m => ({ default: m.DynastyMap })))
-const DynastyPage = lazy(() => import('./features/scenes/DynastyPage').then(m => ({ default: m.DynastyPage })))
-const ChallengePage = lazy(() => import('./features/poetry/ChallengePage').then(m => ({ default: m.ChallengePage })))
-const FeihuaLingPage = lazy(() => import('./features/poetry/FeihuaLingPage').then(m => ({ default: m.FeihuaLingPage })))
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useSession()
 
-function LoginPage() {
-  const navigate = useNavigate()
-  return <AuthPage onSuccess={() => navigate('/app/home')} />
+  if (loading) {
+    return <div className="screen-shell flex items-center justify-center"><div className="paper-panel px-8 py-6 text-center text-sm font-semibold text-slate-500">正在铺开诗词长卷…</div></div>
+  }
+
+  if (!user) {
+    return <Navigate to="/" replace />
+  }
+
+  return <>{children}</>
 }
 
-function ProtectedWithLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <ProtectedRoute>
-      <AppLayout>{children}</AppLayout>
-    </ProtectedRoute>
-  )
+function HomeGate() {
+  const { user, loading } = useSession()
+
+  if (loading) {
+    return <div className="screen-shell flex items-center justify-center"><div className="paper-panel px-8 py-6 text-center text-sm font-semibold text-slate-500">正在校验会话…</div></div>
+  }
+
+  return user ? <Navigate to="/play" replace /> : <AuthPage />
 }
 
 export default function App() {
   return (
-    <AuthProvider>
+    <SessionProvider>
       <BrowserRouter>
-        <Suspense fallback={<div className="flex items-center justify-center py-20 text-text-muted">加载中…</div>}>
-          <Routes>
-            <Route path="/" element={<LoginPage />} />
-            <Route path="/app/home" element={<ProtectedWithLayout><DynastyMap /></ProtectedWithLayout>} />
-            <Route path="/app/dynasty/:dynastyId" element={<ProtectedWithLayout><DynastyPage /></ProtectedWithLayout>} />
-            <Route path="/app/dynasty/:dynastyId/challenge/:poetId" element={<ProtectedWithLayout><ChallengePage /></ProtectedWithLayout>} />
-            <Route path="/app/feihualing" element={<ProtectedWithLayout><FeihuaLingPage /></ProtectedWithLayout>} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
+        <Routes>
+          <Route path="/" element={<HomeGate />} />
+          <Route path="/play" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+          <Route path="/dynasties/:dynastyId" element={<ProtectedRoute><DynastyPage /></ProtectedRoute>} />
+          <Route path="/challenge/:poetId" element={<ProtectedRoute><ChallengePage /></ProtectedRoute>} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </BrowserRouter>
-    </AuthProvider>
+    </SessionProvider>
   )
 }

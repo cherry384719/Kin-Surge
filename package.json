@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "server:dev": "cd server && go run ./cmd/api",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -12,8 +13,6 @@
     "test:run": "vitest run"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.98.0",
-    "fuse.js": "^7.1.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.1"
